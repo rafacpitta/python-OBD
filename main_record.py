@@ -32,3 +32,8 @@ connection.start()
 time.sleep(10)
 print "Iterations: " + str(c/2)
 connection.stop()
+
+#	r = self.__send(b"AT CRA 7E8")
+#        if not self.__isok(r):
+#            self.__error("AT CRA 7E8 did not return 'OK'")
+#            return
