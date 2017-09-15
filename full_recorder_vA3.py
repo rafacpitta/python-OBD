@@ -13,11 +13,39 @@ cnt=1
 while tries<1:
 	try:
 		connection = obd.Async('/dev/rfcomm1')
-			
+		max_idx = 0
 		initial_time = datetime.now()
 		f = open('/home/pi/OBD_Logs/results_'+str(initial_time)[:19]+'.csv', 'w')
 		f.write('time,rpm,thr_percent,speed,int_pressure')
 		 
+		def callback(r):
+			global df
+			current_time = datetime.now()
+			global max_idx
+			dif = current_time - initial_time
+			if not(np.isnan(df.index.max())):
+				
+				#Variavel ja aquisitada
+				try: 
+					if np.isnan(df.loc[max_idx, str(r.u)]):
+						df.loc[max_idx, str(r.u)] = r.magnitude
+					else:
+						max_idx += 1
+						df.loc[max_idx, str(r.u)] = r.magnitude
+				#Variavel ainda nao reaquisitada
+				except KeyError:
+					df.loc[df.index.max(), str(r.u)] = r.magnitude
+				
+				except AttributeError:
+					cnt = 0
+					
+				df.loc[max_idx, 'time'] = dif
+
+			else:
+				df.loc[0,'time'] = dif
+				df.loc[0, str(r.u)] = r.magnitude
+		
+		
 		def new_rpm(r):
 			global cnt
 			global f
